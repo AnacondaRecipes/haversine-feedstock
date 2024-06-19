@@ -24,10 +24,6 @@ requirements:
   run:
     - python
 
-# It looks as though they expect a rounding error but Windows doesn't
-# give them one:
-# AssertionError: assert 90.0 == 89.99999999999997
-{% set tests_to_skip = "test_haversine_deg_rad_great_circle_distance" %}
 
 test:
   source_files:
@@ -42,7 +38,10 @@ test:
   commands:
     - pip check
     - pytest -v tests                                # [not win]
-    - pytest -v tests -k "not ({{ tests_to_skip }})" # [win]
+    # It looks as though they expect a rounding error but Windows doesn't
+    # give them one:
+    # AssertionError: assert 90.0 == 89.99999999999997
+    - pytest -v tests -k "not test_haversine_deg_rad_great_circle_distance" # [win]
 
 about:
   home: https://github.com/mapado/haversine
