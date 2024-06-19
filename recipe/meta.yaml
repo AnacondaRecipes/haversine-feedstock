@@ -1,3 +1,4 @@
+{% set name = "haversine" %}
 {% set version = "2.7.0" %}
 
 package:
@@ -5,20 +6,22 @@ package:
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/h/haversine/haversine-{{ version }}.tar.gz
+  url: https://pypi.io/packages/source/{{ name[0] }}/haversine/haversine-{{ version }}.tar.gz
   sha256: 9dd62c95bff9c43eb898604625e80db68b8b9e91a5111338f55ebcf470dd5a3d
 
 build:
+  skip: True  # [py<35]
   number: 0
-  noarch: python
-  script: {{ PYTHON }} -m pip install . -vv
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
 
 requirements:
   host:
-    - python >=3.5
+    - python
     - pip
+    - setuptools
+    - wheel
   run:
-    - python >=3.5
+    - python
     # - enum34  # [py<34]
 
 test:
@@ -33,7 +36,13 @@ about:
   home: https://github.com/mapado/haversine
   license: MIT
   license_file: LICENSE
+  license_family: MIT
   summary: Calculate the distance between 2 points on Earth
+  description: |
+    Calculate the distance (in various units) between two points on
+    Earth using their latitude and longitude.
+  doc_url: https://github.com/mapado/haversine
+  dev_url: https://github.com/mapado/haversine
 
 extra:
   recipe-maintainers:
