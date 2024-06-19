@@ -1,13 +1,14 @@
 {% set name = "haversine" %}
-{% set version = "2.7.0" %}
+{% set version = "2.8.1" %}
 
 package:
   name: haversine
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/haversine/haversine-{{ version }}.tar.gz
-  sha256: 9dd62c95bff9c43eb898604625e80db68b8b9e91a5111338f55ebcf470dd5a3d
+  # Use upstream archive tarball for tests
+  url: https://github.com/mapado/haversine/archive/refs/tags/v{{ version }}.tar.gz
+  sha256: fa06d5570b5d7ef1d0249575db381b802e4826bd6bd3b7c843f8fa63c22b5107
 
 build:
   skip: True  # [py<35]
@@ -22,15 +23,20 @@ requirements:
     - wheel
   run:
     - python
-    # - enum34  # [py<34]
 
 test:
+  source_files:
+    - tests
   imports:
     - haversine
-  commands:
-    - pip check
   requires:
     - pip
+    - pytest
+    # The performance tests require numpy
+    - numpy
+  commands:
+    - pip check
+    - pytest -v tests
 
 about:
   home: https://github.com/mapado/haversine
