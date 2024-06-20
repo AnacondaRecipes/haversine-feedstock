@@ -1,39 +1,59 @@
-{% set version = "2.7.0" %}
+{% set name = "haversine" %}
+{% set version = "2.8.1" %}
 
 package:
   name: haversine
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/h/haversine/haversine-{{ version }}.tar.gz
-  sha256: 9dd62c95bff9c43eb898604625e80db68b8b9e91a5111338f55ebcf470dd5a3d
+  # Use upstream archive tarball for tests
+  url: https://github.com/mapado/haversine/archive/refs/tags/v{{ version }}.tar.gz
+  sha256: fa06d5570b5d7ef1d0249575db381b802e4826bd6bd3b7c843f8fa63c22b5107
 
 build:
+  skip: True  # [py<35]
   number: 0
-  noarch: python
-  script: {{ PYTHON }} -m pip install . -vv
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
 
 requirements:
   host:
-    - python >=3.5
+    - python
     - pip
+    - setuptools
+    - wheel
   run:
-    - python >=3.5
-    # - enum34  # [py<34]
+    - python
+
 
 test:
+  source_files:
+    - tests
   imports:
     - haversine
-  commands:
-    - pip check
   requires:
     - pip
+    - pytest
+    # The performance tests require numpy
+    - numpy
+  commands:
+    - pip check
+    - pytest -v tests                                # [not win]
+    # It looks as though they expect a rounding error but Windows doesn't
+    # give them one:
+    # AssertionError: assert 90.0 == 89.99999999999997
+    - pytest -v tests -k "not test_haversine_deg_rad_great_circle_distance" # [win]
 
 about:
   home: https://github.com/mapado/haversine
   license: MIT
   license_file: LICENSE
+  license_family: MIT
   summary: Calculate the distance between 2 points on Earth
+  description: |
+    Calculate the distance (in various units) between two points on
+    Earth using their latitude and longitude.
+  doc_url: https://github.com/mapado/haversine
+  dev_url: https://github.com/mapado/haversine
 
 extra:
   recipe-maintainers:
